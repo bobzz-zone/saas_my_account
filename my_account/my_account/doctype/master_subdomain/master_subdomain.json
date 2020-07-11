@@ -1,0 +1,109 @@
+{
+ "autoname": "field:subdomain",
+ "creation": "2018-01-04 14:39:20.330205",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "subdomain",
+  "is_created",
+  "user",
+  "quota",
+  "active_plan",
+  "active_modules",
+  "periodic",
+  "disable_if_not_pay",
+  "on_trial",
+  "extend_trial"
+ ],
+ "fields": [
+  {
+   "fieldname": "subdomain",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Subdomain",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "is_created",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Is Created"
+  },
+  {
+   "fieldname": "user",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "User",
+   "options": "User",
+   "reqd": 1
+  },
+  {
+   "fieldname": "quota",
+   "fieldtype": "Int",
+   "label": "Quota",
+   "read_only": 1
+  },
+  {
+   "fieldname": "active_plan",
+   "fieldtype": "Link",
+   "label": "Active Plan",
+   "options": "Price List",
+   "read_only": 1
+  },
+  {
+   "fieldname": "active_modules",
+   "fieldtype": "Table",
+   "label": "Active Modules",
+   "options": "Domain Active Modules"
+  },
+  {
+   "fieldname": "periodic",
+   "fieldtype": "Select",
+   "label": "Periodic",
+   "options": "Monthly\nYearly"
+  },
+  {
+   "default": "0",
+   "fieldname": "disable_if_not_pay",
+   "fieldtype": "Check",
+   "label": "Disable If Not Pay"
+  },
+  {
+   "default": "0",
+   "fieldname": "on_trial",
+   "fieldtype": "Check",
+   "label": "On Trial"
+  },
+  {
+   "default": "0",
+   "fieldname": "extend_trial",
+   "fieldtype": "Check",
+   "label": "Extend Trial"
+  }
+ ],
+ "modified": "2020-07-10 10:32:43.939265",
+ "modified_by": "Administrator",
+ "module": "My Account",
+ "name": "Master Subdomain",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

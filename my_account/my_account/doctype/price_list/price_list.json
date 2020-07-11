@@ -1,0 +1,123 @@
+{
+ "allow_rename": 1,
+ "autoname": "field:price_list",
+ "creation": "2018-01-23 10:23:27.360253",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "disabled",
+  "price_list",
+  "active_days",
+  "normal_price",
+  "discount_price",
+  "yearly_price",
+  "ppn",
+  "cb1",
+  "price_list_type",
+  "user_qty",
+  "benefit"
+ ],
+ "fields": [
+  {
+   "default": "0",
+   "fieldname": "disabled",
+   "fieldtype": "Check",
+   "label": "Disabled"
+  },
+  {
+   "fieldname": "price_list",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Price List Name",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "active_days",
+   "fieldtype": "Int",
+   "label": "Active Days",
+   "reqd": 1
+  },
+  {
+   "fieldname": "normal_price",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Normal Price",
+   "reqd": 1
+  },
+  {
+   "fieldname": "discount_price",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Discount Price",
+   "reqd": 1
+  },
+  {
+   "fieldname": "ppn",
+   "fieldtype": "Select",
+   "label": "PPN",
+   "options": "\nInclude\nExclude",
+   "reqd": 1
+  },
+  {
+   "fieldname": "cb1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "price_list_type",
+   "fieldtype": "Select",
+   "label": "Price List Type",
+   "options": "Single User\nPackage User",
+   "reqd": 1
+  },
+  {
+   "fieldname": "user_qty",
+   "fieldtype": "Int",
+   "label": "User Qty",
+   "reqd": 1
+  },
+  {
+   "fieldname": "benefit",
+   "fieldtype": "Text",
+   "label": "Benefit"
+  },
+  {
+   "fieldname": "yearly_price",
+   "fieldtype": "Currency",
+   "hidden": 1,
+   "label": "Yearly Price"
+  }
+ ],
+ "modified": "2020-07-02 22:42:05.402257",
+ "modified_by": "Administrator",
+ "module": "My Account",
+ "name": "Price List",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "My Account Role",
+   "share": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

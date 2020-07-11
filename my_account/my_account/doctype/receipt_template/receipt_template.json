@@ -1,0 +1,68 @@
+{
+ "creation": "2020-05-09 23:40:33.101846",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "disabled",
+  "subdomain",
+  "full_name",
+  "email_body",
+  "faq"
+ ],
+ "fields": [
+  {
+   "fieldname": "disabled",
+   "fieldtype": "Data",
+   "label": "Disabled"
+  },
+  {
+   "fieldname": "subdomain",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Subdomain",
+   "options": "Master Subdomain",
+   "reqd": 1
+  },
+  {
+   "fieldname": "full_name",
+   "fieldtype": "Read Only",
+   "label": "Full Name"
+  },
+  {
+   "fieldname": "email_body",
+   "fieldtype": "Text Editor",
+   "label": "Email Body"
+  },
+  {
+   "default": "invoice number : {{ invoice_no }}\ninvoice amount : {{ invoice_amount }}\ninvoice paid date : {{ invoice_paid_date }}\nfull name : {{ full_name }}\neg.: Your invoice number : {{ invoice_no }} has been paid",
+   "fieldname": "faq",
+   "fieldtype": "Small Text",
+   "label": "FAQ",
+   "read_only": 1
+  }
+ ],
+ "modified": "2020-05-09 23:40:33.101846",
+ "modified_by": "Administrator",
+ "module": "My Account",
+ "name": "Receipt Template",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

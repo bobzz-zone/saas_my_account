@@ -1,0 +1,37 @@
+{
+ "creation": "2020-06-18 11:17:00.818448",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "module_name",
+  "module_price"
+ ],
+ "fields": [
+  {
+   "fieldname": "module_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Module Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "module_price",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Module Price",
+   "reqd": 1
+  }
+ ],
+ "istable": 1,
+ "modified": "2020-06-18 11:17:00.818448",
+ "modified_by": "Administrator",
+ "module": "My Account",
+ "name": "Additional Modules",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
