@@ -51,7 +51,7 @@ def validate_user_quota(doc,method):
 			usr_enabled = frappe.get_doc("User",doc.name)
 			if usr_enabled.enabled == 1:
 				frappe.db.sql("UPDATE `tabUser` set enabled = 0 where name = '{}'".format(doc.name))
-			frappe.throw("Max enabled users reached ({}/{})".format(flt(quota),flt(enabled_users)))
+			frappe.throw("Max enabled users reached for {} ({}/{})".format(subdomain,flt(quota),flt(enabled_users)))
 	# custom saas andy for solubis check for update password
 	if doc.new_password:
 		# check if my account installed
