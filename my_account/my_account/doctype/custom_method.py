@@ -46,12 +46,12 @@ def validate_user_quota(doc,method):
 
 		# print("enabled = {}".format(enabled_users))
 		# print("quota = {}".format(quota))
-		if flt(quota)+1 < flt(enabled_users)+1:
+		if flt(quota) < flt(enabled_users)-1:
 			# if user created delete user
 			usr_enabled = frappe.get_doc("User",doc.name)
 			if usr_enabled.enabled == 1:
 				frappe.db.sql("UPDATE `tabUser` set enabled = 0 where name = '{}'".format(doc.name))
-			frappe.throw("Max enabled users reached")
+			frappe.throw("Max enabled users reached ({}/{})".format(flt(quota)+flt(enabled_users)))
 	# custom saas andy for solubis check for update password
 	if doc.new_password:
 		# check if my account installed
