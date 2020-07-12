@@ -85,7 +85,6 @@ def payment_success_with_payment_gateway(invoice):
 	data_invoice.status_payment = "Success"
 	data_invoice.flags.ignore_permissions = True
 	data_invoice.save()
-	frappe.db.commit()
 	# mengaktifkan user
 
 	_subdomain = frappe.get_doc("Master Subdomain", data_invoice.subdomain)
@@ -117,7 +116,7 @@ def payment_success_with_payment_gateway(invoice):
 				email = _subdomain.user
 				tidaklengkap = subdom_name
 				# create site setelah user bayar (flow no trial)
-				# enqueue("frappe.custom_dns_api.create_new_site_subprocess", newsitename=lengkap, sitesubdomain=subdom_name, subdomuser=_subdomain.user,  fullname_user=full_name)
+				enqueue("my_account.custom_dns_api.create_new_site_subprocess", newsitename=lengkap, sitesubdomain=subdom_name, subdomuser=_subdomain.user,  fullname_user=full_name)
 			_subdomain.disable_if_not_pay = 0
 
 			
@@ -131,7 +130,7 @@ def payment_success_with_payment_gateway(invoice):
 			subdom_name = _subdomain.name.lower()
 			lengkap = "{}.solubis.id".format(subdom_name)
 			full_name = frappe.db.get_value("User", _subdomain.user, 'full_name')
-			enqueue("frappe.custom_dns_api.create_new_site_subprocess", newsitename=lengkap, sitesubdomain=subdom_name, subdomuser=_subdomain.user,  fullname_user=full_name)
+			enqueue("my_account.custom_dns_api.create_new_site_subprocess", newsitename=lengkap, sitesubdomain=subdom_name, subdomuser=_subdomain.user,  fullname_user=full_name)
 
 
 		if i.type == "Add Module":
@@ -546,7 +545,7 @@ def test_reset():
 # 	if subdom_is_created == 0:
 # 		lengkap = "{}.crativate.com".format(subdom_name)
 # 		tidaklengkap = subdom_name
-# 		enqueue("frappe.custom_dns_api.create_new_site_subprocess", newsitename=lengkap, sitesubdomain=tidaklengkap, subdomuser=subdom_user, subdompass=subdom_pass, fullname_user=fullname_user)
+# 		enqueue("my_account.custom_dns_api.create_new_site_subprocess", newsitename=lengkap, sitesubdomain=tidaklengkap, subdomuser=subdom_user, subdompass=subdom_pass, fullname_user=fullname_user)
 
 # 		return "success"
 
@@ -710,7 +709,7 @@ def test_reset():
 # 			data_user.save()
 
 # 			lengkap = "{}.crativate.com".format(subdomain)
-# 			enqueue("frappe.custom_dns_api.create_new_user_on_erp_site", newsitename=lengkap, email=data_user.email, fullname=data_user.fullname, password=data_user.current_password)
+# 			enqueue("my_account.custom_dns_api.create_new_user_on_erp_site", newsitename=lengkap, email=data_user.email, fullname=data_user.fullname, password=data_user.current_password)
 
 
 			

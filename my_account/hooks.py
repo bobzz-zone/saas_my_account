@@ -80,9 +80,9 @@ app_license = "MIT"
 # Hook on document methods and events
 #
 doc_events = {
-	"General Information": {
-		# "on_submit": "frappe.sync_server_settings.create_new_user1"
-		# "on_submit": "frappe.custom_dns_api.take_new_site"
+	"User": {
+		"on_update": "my_account.my_account.doctype.custom_method.validate_user_quota"
+		# "on_submit": "my_account.custom_dns_api.take_new_site"
 		# "on_submit" : my_account.doctype.sync_server_settings.create_new_user
 	}
 }
@@ -105,26 +105,26 @@ scheduler_events = {
 	# 	"my_account.tasks.weekly"
 	# ]
 	# "monthly": [
-		# "my_account.my_account.doctype.solubis_custom.auto_invoice_monthly"
+		# "my_account.my_account.doctype.api_data.auto_invoice_monthly"
 	# 	"my_account.tasks.monthly"
 	# ],
 	# "yearly": [
-		# "my_account.my_account.doctype.solubis_custom.auto_invoice_yearly"
+		# "my_account.my_account.doctype.api_data.auto_invoice_yearly"
 
 	# ],
 	# tiap tanggal 25 setiap bulan
 	"0 0 20 * *":[
-		"my_account.my_account.doctype.solubis_custom.auto_invoice_monthly"
+		"my_account.my_account.doctype.api_data.auto_invoice_monthly"
 	],
 	# tiap tanggal 25 bulan Desember
 	"0 0 25 12 *":[
-		"my_account.my_account.doctype.solubis_custom.auto_invoice_yearly"
+		"my_account.my_account.doctype.api_data.auto_invoice_yearly"
 	],
 	"0 0 1 * *":[
-		"my_account.my_account.doctype.solubis_custom.set_site_disabled"
+		"my_account.my_account.doctype.api_data.set_site_disabled"
 	],
 	"0 0 2 * *":[
-		"my_account.my_account.doctype.solubis_custom.remove_extend_trial"
+		"my_account.my_account.doctype.api_data.remove_extend_trial"
 	]
 }
 

@@ -10,21 +10,226 @@ import requests
 import json
 import subprocess
 from frappe.utils.background_jobs import enqueue
+from frappe.utils.password import update_password as _update_password
 from frappe import utils
 import re
-
+from my_account.my_account.doctype.buy_new_user.buy_new_user import create_xendit_invoice
+from frappe.utils import get_url
 import json
-
+from frappe.utils.user import get_user_fullname
 
 class custom_method(Document):
 	pass
 
-
-
 @frappe.whitelist(allow_guest=True)
-def ding():
-	return "dong"
+def sign_up(email, full_name , subdomain, phone, plan, periodic, redirect_to):
+	setting = frappe.get_single("Additional Settings")
+	if not redirect_to:
+		redirect_to=setting.billing_url
+	user = frappe.db.get("User", {"email": email})
+	
+	# check subdomain exist
+	domain_exist = frappe.db.get("Master Subdomain", {"name": subdomain})
 
+	if domain_exist:
+		return 0, _("Subdomain Exist")
+
+	if user:
+		if user.disabled:
+			return 0, _("Email Registered but disabled")
+		else:
+			return 0, _("Email Already Registered")
+	else:
+		if frappe.db.sql("""select count(*) from tabUser where
+			HOUR(TIMEDIFF(CURRENT_TIMESTAMP, TIMESTAMP(modified)))=1""")[0][0] > 300:
+
+			frappe.respond_as_web_page(_('Temperorily Disabled'),
+				_('Too many users signed up recently, so the registration is disabled. Please try back in an hour'),
+				http_status_code=429)
+
+		from frappe.utils import random_string
+		
+		# flow without trial
+
+		plist = frappe.get_doc("Price List",plan)
+
+		inv = frappe.new_doc("Invoice")
+		inv.status = "Unpaid"
+		inv.subdomain = subdomain.lower()
+		inv.total_user = 1
+		days_left = 0
+		total = 0
+
+		if periodic == "Monthly":
+			days_left = date_diff(get_last_day(today()),today()) + 1
+			total = int(int(plist.normal_price) * days_left/30)
+		# full_days = date_diff(get_last_day(today()),get_first_day(utils.today())) + 1
+		else:
+			days_left = date_diff(get_last_day(today()),today()) + 1
+			year = utils.today().split("-")[0]
+			months_left = utils.month_diff("{}-12-31".format(year),utils.today()) - 1
+			cur_mth = int(int(plist.normal_price) * days_left/30)
+			mth_left = int(plist.normal_price) * mth_left
+			total = cur_mth + mth_left
+
+		inv.append("invoice_item",{
+				"description": email,
+				"price_list": plan,
+				"price_list_rate": plist.normal_price,
+				"fullname": full_name,
+				"discount":0,
+				"discount_rate": plist.discount_price,
+				"price": plist.normal_price,
+				"type":"New User"
+			})
+		inv.total = int(total)
+		inv.owner = email
+		inv.discount = 0
+		inv.grand_total = int(total)
+		inv.flags.ignore_permissions = True
+		inv.save()
+		desc = "Invoice for {} Register with plan {}".format(subdomain.lower(), plist.name)
+
+		pay_link = create_xendit_invoice(inv.name, desc)
+		# end flow
+
+		# create purchase user
+		purchase_user = frappe.new_doc("Purchase User")
+		purchase_user.fullname = full_name
+		purchase_user.email = email
+		purchase_user.enabled = 0
+		purchase_user.status = "Unpaid"
+		purchase_user.phone = phone
+		purchase_user.subdomain = subdomain.lower()
+		purchase_user.days_active = 0
+		purchase_user.price_list = plan
+		purchase_user.flags.ignore_permissions = True
+		purchase_user.owner = email
+		purchase_user.save()
+
+		user = frappe.get_doc({
+			"doctype":"User",
+			"email": email,
+			"first_name": full_name,
+			"enabled": 1,
+			"send_welcome_email" :0,
+			"new_password": random_string(10),
+			"user_type": "Website User",
+			"phone": phone,
+			# "subdomain" : subdomain.lower(),
+			"block_modules" : [
+				{"module" : "Contacts"},
+				{"module" : "Desk"},
+				{"module" : "File Manager"},
+				{"module" : "Integrations"},
+				{"module" : "Setup"},
+				{"module" : "Core"},
+				{"module" : "Email Inbox"},
+				{"module" : "Website"}
+			],
+			"roles" : [
+				{"role" : "My Account Role"}
+			]
+		})
+		user.flags.ignore_permissions = True
+		user.insert()
+
+		pl = frappe.get_doc("Price List",plan)
+		# create subdomain
+		sdm = frappe.new_doc("Master Subdomain")
+		sdm.subdomain = subdomain.lower()
+		sdm.is_created = 0
+		sdm.user = email
+		sdm.active_plan = plan
+		sdm.quota = pl.user_qty
+		sdm.disable_if_not_pay = 1
+		sdm.on_trial = 0
+		sdm.periodic = periodic
+		sdm.flags.ignore_permissions = True
+		sdm.save()
+
+		#edited bobby - added
+		subdom_name = subdomain.lower()
+		lengkap = "{}.{}".format(subdom_name,setting.url)
+		tidaklengkap = subdom_name
+		# flow trial 
+		# enqueue("my_account.custom_dns_api.create_new_site_subprocess", newsitename=lengkap, sitesubdomain=subdom_name, subdomuser=email,  fullname_user=full_name)
+		#end add
+
+		#welcome email sent
+
+		link = user.reset_password()
+		subject = None
+		method = frappe.get_hooks("welcome_email")
+		if method:
+			subject = frappe.get_attr(method[-1])()
+		if not subject:
+			site_name = frappe.db.get_default('site_name') or frappe.get_conf().get("site_name")
+			if site_name:
+				subject = _("Welcome to {0}".format(site_name))
+			else:
+				subject = _("Complete Registration")
+
+		# custom andy email to pay site registration flow invoice bayar baru create site
+		#invoice = frappe.get_doc("Invoice",{"owner":self.name})
+		# print(invoice.xendit_url)
+		user.send_login_mail(subject, "new_user",
+				dict(
+					link=link,
+					site_url=get_url(),
+					# custom andy email to pay site registration flow invoice bayar baru create site
+					pay_link=pay_link
+				))
+
+		if redirect_to:
+			frappe.cache().hset('redirect_after_login', user.name, redirect_to)
+
+		return 1, _("Please check your email for new account verification"), pay_link
+		
+@frappe.whitelist(allow_guest=True)
+def update_password(new_password, logout_all_sessions=0, key=None, old_password=None):
+	setting = frappe.get_single("Additional Settings")
+	
+	res = _get_user_for_update_password(key, old_password)
+	if res.get('message'):
+		#start custom
+		#frappe.local.response.http_status_code = 410
+		return res['message']
+	else:
+		user = res['user']
+	subdom = frappe.get_all('Master Subdomain', filters={'user': user}, fields=['name', 'user', 'is_created'])
+	subdom_name = subdom[0]["name"]
+	subdom_is_created = subdom[0]["is_created"]
+	subdom_user = subdom[0]["user"]
+	subdom_pass = new_password
+	_update_password(user, new_password, logout_all_sessions=int(logout_all_sessions))
+
+	# get fullname
+	user_data = frappe.get_doc("User",user)
+	fullname_user = user_data.first_name
+	user_subdomain = user_data.subdomain
+	# edited rico - enqueue create site
+	# edited bobby comment
+	lengkap = "{}.{}".format(subdom_name,setting.url)
+
+	# create site setelah user set password (flow trial)
+	#if subdomain.is_created == 0:
+	#	enqueue("my_account.custom_dns_api.create_new_site_subprocess", newsitename=lengkap, sitesubdomain=subdom_name, subdomuser=email,  fullname_user=full_name)
+
+
+	user_doc, redirect_url = reset_user_data(user)
+	frappe.local.login_manager.login_as(user)
+
+	frappe.db.set_value("User", user, "last_password_reset_date", today())
+	frappe.db.set_value("User", user, "reset_password_key", "")
+
+	if user_doc.user_type == "System User":
+		#return "/desk"
+		# return "https://"+lengkap
+		# nanti ini direplace dengan solubis.id
+		return setting.billing_url+"login"
+	else:
+		return "https://"+lengkap
 
 @frappe.whitelist(allow_guest=True)
 def check_new_user_register():
@@ -488,15 +693,14 @@ def create_new_user_register_and_subdomain():
 	purchase_user.save()
 
 	frappe.db.sql(""" UPDATE `tabPurchase User` SET owner = "{0}", modified_by = "{1}" WHERE name = "{2}" """.format(email, email, email))
-	frappe.db.commit()
-
+	
 	return "success"
 
 
 	
 @frappe.whitelist(allow_guest=True)
 def activate_subdomain_and_install_erp():
-	
+	setting = frappe.get_single("Additional Settings")
 	data = frappe.form_dict.get('data')
 	data = json.loads(str(data))
 
@@ -517,9 +721,9 @@ def activate_subdomain_and_install_erp():
 	user_subdomain = subdomain
 
 	if subdom_is_created == 0:
-		lengkap = "{}.solubis.id".format(subdom_name)
+		lengkap = "{}.{}".format(subdom_name,setting.url)
 		tidaklengkap = subdom_name
-		enqueue("frappe.custom_dns_api.create_new_site_subprocess", newsitename=lengkap, sitesubdomain=tidaklengkap, subdomuser=subdom_user, subdompass=subdom_pass, fullname_user=fullname_user)
+		enqueue("my_account.custom_dns_api.create_new_site_subprocess", newsitename=lengkap, sitesubdomain=tidaklengkap, subdomuser=subdom_user, subdompass=subdom_pass, fullname_user=fullname_user)
 
 		return "success"
 
@@ -570,9 +774,7 @@ def create_new_user_buy_by_user():
 		purchase_user.save()
 
 		frappe.db.sql(""" UPDATE `tabPurchase User` SET owner = "{0}", modified_by = "{1}" WHERE name = "{2}" """.format(user, user, user))
-		frappe.db.commit()
-
-
+		
 	# create invoice
 	invoice = frappe.new_doc("Invoice")
 	invoice.posting_date = posting_date
@@ -647,7 +849,6 @@ def create_new_user_buy_by_user():
 	invoice2.save()
 
 	frappe.db.sql(""" UPDATE `tabInvoice` SET owner = "{0}", modified_by = "{1}" WHERE name = "{2}" """.format(user, user, invoice2.name))
-	frappe.db.commit()
 
 	return  "success, check your invoice : "+str(invoice.name)
 
@@ -655,7 +856,7 @@ def create_new_user_buy_by_user():
 
 @frappe.whitelist(allow_guest=True)
 def activate_new_user_buy_and_add_to_erp_after_payment():
-	
+	setting = frappe.get_single("Additional Settings")
 	data = frappe.form_dict.get('data')
 	data = json.loads(str(data))
 
@@ -671,7 +872,6 @@ def activate_new_user_buy_and_add_to_erp_after_payment():
 	data_invoice.save()
 
 	frappe.db.sql(""" UPDATE `tabInvoice` SET owner = "{0}", modified_by = "{1}" WHERE name = "{2}" """.format(user, user, data_invoice.name))
-	frappe.db.commit()
 
 	# mengaktifkan user
 
@@ -691,8 +891,8 @@ def activate_new_user_buy_and_add_to_erp_after_payment():
 			data_user.flags.ignore_permissions = True
 			data_user.save()
 
-			lengkap = "{}.solubis.id".format(subdomain)
-			enqueue("frappe.custom_dns_api.create_new_user_on_erp_site", newsitename=lengkap, email=data_user.email, fullname=data_user.fullname, password=data_user.current_password)
+			lengkap = "{}.{}".format(subdomain,setting.url)
+			enqueue("my_account.custom_dns_api.create_new_user_on_erp_site", newsitename=lengkap, email=data_user.email, fullname=data_user.fullname, password=data_user.current_password)
 
 			
 
@@ -706,6 +906,27 @@ def activate_new_user_buy_and_add_to_erp_after_payment():
 	history_payment.save()
 
 	frappe.db.sql(""" UPDATE `tabHistory Payment` SET owner = "{0}", modified_by = "{1}" WHERE name = "{2}" """.format(user, user, history_payment.name))
-	frappe.db.commit()
 
 	return  "success"
+
+def _get_user_for_update_password(key, old_password):
+	# verify old password
+	if key:
+		user = frappe.db.get_value("User", {"reset_password_key": key})
+		if not user:
+			return {
+				#'message': _("The Link specified has either been used before or Invalid")
+				'message': _("Cannot Update: Incorrect / Expired Link.")
+			}
+
+	elif old_password:
+		# verify old password
+		frappe.local.login_manager.check_password(frappe.session.user, old_password)
+		user = frappe.session.user
+
+	else:
+		return
+
+	return {
+		'user': user
+	}

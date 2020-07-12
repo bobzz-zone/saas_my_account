@@ -59,7 +59,7 @@ class ActivateUser(Document):
 				data_user.save()
 
 				lengkap = "{}.antusias.id".format(self.subdomain)
-				enqueue("frappe.custom_dns_api.create_new_user_on_erp_site", newsitename=lengkap, email=data_user.email, fullname=data_user.fullname, password=data_user.current_password)
+				enqueue("my_account.custom_dns_api.create_new_user_on_erp_site", newsitename=lengkap, email=data_user.email, fullname=data_user.fullname, password=data_user.current_password)
 
 
 				

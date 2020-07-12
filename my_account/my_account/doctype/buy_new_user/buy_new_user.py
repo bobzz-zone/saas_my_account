@@ -328,7 +328,7 @@ def create_xendit_invoice(invoice=None, desc=None):
 		_invoice.xendit_url = result['invoice_url']
 		_invoice.xendit_code = result['id']
 		_invoice.save(ignore_permissions=True)
-		frappe.db.commit()
+		#frappe.db.commit()
 
 		return _invoice.xendit_url
 	else:
