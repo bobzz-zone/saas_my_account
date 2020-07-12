@@ -11,6 +11,7 @@ import json
 import subprocess
 from frappe.utils.background_jobs import enqueue
 import re
+from frappe.utils import cint, flt
 
 
 class custom_method(Document):
@@ -45,7 +46,7 @@ def validate_user_quota(doc,method):
 
 		# print("enabled = {}".format(enabled_users))
 		# print("quota = {}".format(quota))
-		if float(quota) < float(enabled_users)+1:
+		if flt(quota) < flt(enabled_users)+1:
 			# if user created delete user
 			usr_enabled = frappe.get_doc("User",username)
 			if usr_enabled.enabled == 1:
