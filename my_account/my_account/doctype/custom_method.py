@@ -29,7 +29,7 @@ def validate_user_quota(doc,method):
 	desktop = frappe.db.sql("SELECT defvalue FROM `tabDefaultValue` WHERE defkey = 'desktop:home_page'")[0][0]
 	is_created = 1
 	try:
-		subdomain = frappe.local.site.strip(".")[0]
+		subdomain = frappe.local.site.split(".")[0]
 	except:
 		frappe.throw("Domain not found")
 	if subdomain == "reg":
@@ -51,7 +51,7 @@ def validate_user_quota(doc,method):
 			usr_enabled = frappe.get_doc("User",doc.name)
 			if usr_enabled.enabled == 1:
 				frappe.db.sql("UPDATE `tabUser` set enabled = 0 where name = '{}'".format(doc.name))
-			frappe.throw("Max enabled users reached for {} ({}/{})".format(subdomain,flt(quota),flt(enabled_users)))
+			frappe.throw("Max enabled users reached for {} ({}/{})".format(frappe.local.site,flt(quota),flt(enabled_users)))
 	# custom saas andy for solubis check for update password
 	if doc.new_password:
 		# check if my account installed
