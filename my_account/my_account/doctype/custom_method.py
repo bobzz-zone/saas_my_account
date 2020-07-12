@@ -20,7 +20,7 @@ class custom_method(Document):
 @frappe.whitelist()
 def get_enabled_users():
 	return frappe.db.sql("""select CAST(COUNT(*) AS CHAR) from `tabUser`
-		where enabled = 1 and name not in ("Administrator","Guest","info@solubis.id") """)[0][0]
+		where enabled = 1 and name not in ("Administrator","Guest") """)[0][0]
 
 @frappe.whitelist()
 def validate_user_quota(doc,method):
@@ -46,7 +46,7 @@ def validate_user_quota(doc,method):
 
 		# print("enabled = {}".format(enabled_users))
 		# print("quota = {}".format(quota))
-		if flt(quota) < flt(enabled_users)+1:
+		if flt(quota)+1 < flt(enabled_users)+1:
 			# if user created delete user
 			usr_enabled = frappe.get_doc("User",doc.name)
 			if usr_enabled.enabled == 1:
