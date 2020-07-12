@@ -52,14 +52,15 @@ def validate_user_quota(doc,method):
 				frappe.db.sql("UPDATE `tabUser` set enabled = 0 where name = '{}'".format(username))
 				frappe.db.commit()
 			frappe.throw("Max enabled users reached")
-	# custom saas andy for solubis
-    # check if my account installed
-    my_acc = frappe.db.sql('SELECT * FROM `tabDefaultValue` WHERE defkey = "installed_apps" AND defvalue LIKE CONCAT("%","my_account","%");')
-    usrexist = frappe.db.sql('SELECT * FROM `tabUser` WHERE name = "{}" and name not in ("Administrator","Guest")'.format(doc.name),as_dict=1)
-    if len(my_acc) > 0 and len(usrexist) > 0:
-        pu = frappe.get_doc("Purchase User", user)
-        pu.current_password = pwd
-        pu.save(ignore_permissions=True)
+	# custom saas andy for solubis check for update password
+	if doc.new_password:
+		# check if my account installed
+		my_acc = frappe.db.sql('SELECT * FROM `tabDefaultValue` WHERE defkey = "installed_apps" AND defvalue LIKE CONCAT("%","my_account","%");')
+		usrexist = frappe.db.sql('SELECT * FROM `tabUser` WHERE name = "{}" and name not in ("Administrator","Guest")'.format(doc.name),as_dict=1)
+		if len(my_acc) > 0 and len(usrexist) > 0:
+			pu = frappe.get_doc("Purchase User", user)
+			pu.current_password = pwd
+			pu.save(ignore_permissions=True)
 
 @frappe.whitelist(allow_guest=True)
 def reduce_days_active_user():
