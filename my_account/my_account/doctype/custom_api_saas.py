@@ -160,7 +160,7 @@ def sign_up(email, full_name , subdomain, phone, plan,password, periodic, redire
 
 		#welcome email sent
 
-		link = user.reset_password()
+		#link = user.reset_password()
 		subject = None
 		method = frappe.get_hooks("welcome_email")
 		if method:
@@ -177,7 +177,7 @@ def sign_up(email, full_name , subdomain, phone, plan,password, periodic, redire
 		# print(invoice.xendit_url)
 		user.send_login_mail(subject, "new_user",
 				dict(
-					link=link,
+					#link=link,
 					site_url=get_url(),
 					# custom andy email to pay site registration flow invoice bayar baru create site
 					pay_link=pay_link
