@@ -23,4 +23,4 @@ frappe/desk/page/setup_wizard/setup_wizard.py remove line 89 (update_user_name)
 
 set hooks validate user pada brand app
 
-
+custom_dns_api.py change brand app + copy custom function for brand app

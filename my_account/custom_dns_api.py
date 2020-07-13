@@ -20,27 +20,13 @@ from frappe.utils.nestedset import rebuild_tree
 class custom_dns_api(Document):
 	pass
 
-
-@frappe.whitelist()
-def halo():
-	print("halo")
-
 @frappe.whitelist()
 def rebuild_tree_error():
 	rebuild_tree("Account", "parent_account")
 
-
 @frappe.whitelist()
 def api_call_create_dns(new_site_name):
 
-	# crativate
-	# d4e84a186887da3dbd6e5e21ab2b0b39
-
-	# rectios
-	# zone id
-	# 28eb32ddc9170235244354e6eae18988
-	# 28eb32ddc9170235244354e6eae18988
-	# antzman = 757307a566e97c7d08935340b281f925
 	url = "https://api.cloudflare.com/client/v4/zones/757307a566e97c7d08935340b281f925/dns_records"
 
 	# payload = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"type\"\r\n\r\nA\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"name\"\r\n\r\nnewsite.crativate.com\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"content\"\r\n\r\n35.197.133.195\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--"
@@ -53,7 +39,7 @@ def api_call_create_dns(new_site_name):
 	headers = {
 	    'content-type': "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW",
 	    'Content-Type': "application/json",
-	    'X-Auth-Email': "bobby.hartanto@arlogy.co.id",
+	    'X-Auth-Email': "bobby@solubis.id",
 	    # api key crativate / rectios : 7eb0d91566ac6409d1957961abac095ec405c
 	    # antusias : 2a7fc7cab52ed7d244db75641d75ca8bf4b93
 	    'X-Auth-Key': "2a7fc7cab52ed7d244db75641d75ca8bf4b93",
@@ -65,26 +51,7 @@ def api_call_create_dns(new_site_name):
 
 	print(response.text)
 
-	# global api key dns
-	# 7eb0d91566ac6409d1957961abac095ec405c
-
-# @frappe.whitelist()
-# def create_new_site_di_home():
-
-# 	host="35.197.153.19"
-# 	user="root"
-# 	client = paramiko.SSHClient()
-# 	k = paramiko.RSAKey.from_private_key_file('/home/frappe/frappe-bench/apps/frappe/frappe/id_frappe_rsa')
-# 	# client.load_system_host_keys()
-# 	client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-# 	client.connect(host, username=user,pkey = k)
-
-# 	stdin, stdout, stderr = client.exec_command('cd /home/frappe/frappe-bench; bench execute erpnext.selling.custom_dns_api.create_new_site')
-# 	# stdin, stdout, stderr = client.exec_command('ls')
-# 	for line in stdout.readlines():
-# 		print line
-    #
-	# client.close()
+	
 #added by bobby
 @frappe.whitelist()
 def create_new_user(newsitename,sitesubdomain, subdomuser, subdompass, fullname_user):
@@ -109,18 +76,16 @@ def create_new_site_subprocess(newsitename,sitesubdomain, subdomuser, fullname_u
 	#os.system("bench setup nginx --yes")
 	#os.system("sudo service nginx reload")
 
-	os.system("bench --site {} execute my_account.custom_dns_api.disable_signup_website".format(new_site_name))
+	os.system("bench --site {} execute solubis_brand.custom_function.disable_signup_website".format(new_site_name))
+	os.system("bench --site {} execute solubis_brand.custom_function.import_fixtures".format(new_site_name))
 	#edited comment bobby
-	os.system(""" bench --site {} execute my_account.custom_dns_api.create_user_baru --args "['{}','{}','{}','{}']" 
+	os.system("""bench --site {} execute solubis_brand.custom_function.create_user_baru --args "['{}','{}','{}','{}']" 
 		""".format(newsitename,fullname_user,subdomuser,subdompass,plan))
-	#end of line
-	#os.system("bench --site {} migrate".format(new_site_name))
 
-	# os.system("bench --site {} execute my_account.custom_dns_api.rebuild_tree_error".format(new_site_name))
-	os.system("bench --site {} execute my_account.custom_fixtures.import_fixtures".format(new_site_name))
+	#end of line
 
 	# disable other roles except for purchased plan
-	os.system(""" bench --site {} execute my_account.custom_dns_api.disable_other_roles --args "['{}']" """.format(plan))
+	os.system(""" bench --site {} execute solubis_brand.custom_function.disable_other_roles --args "['{}']" """.format(plan))
 
 	# sbd = frappe.get_doc("Master Subdomain", sitesubdomain)
 	# sbd.is_created = 1
@@ -128,24 +93,7 @@ def create_new_site_subprocess(newsitename,sitesubdomain, subdomuser, fullname_u
 	frappe.db.sql("""update `tabMaster Subdomain` set is_created = 1 where name = '{}' """.format(sitesubdomain))
 	frappe.db.commit()
 	enqueue("my_account.custom_dns_api.send_mail_site_created",subdomuser=subdomuser,fullname=fullname_user,newsitename=newsitename)
-	# send_mail_site_created(subdomuser,fullname_user,newsitename)
-	# domain = frappe.get_doc("Master Subdomain", site_sub_domain)
-	# domain.is_created = 1
-	# domain.flags.ignore_permissions = True
-	# domain.save()
-	# frappe.db.commit()
 
-
-	# edited rico
-
-	# subject = "Welcome to Solubis"
-	# args = {"full_name":fullname_user,"site_url":newsitename}
-	# frappe.sendmail(recipients=subdomuser, sender="info@solubis.id", subject=subject,
-	# 		template="site_created", header=[subject, "green"], args=args,delayed=False)
-@frappe.whitelist()
-def disable_other_roles(plan):
-	frappe.db.sql("update `tabRole` set disable = 1 where name not in ('Administrator','System Manager','Guest','{}') ".format(plan))
-	frappe.db.commit()
 
 @frappe.whitelist()
 def send_mail_site_created(subdomuser, fullname, newsitename):
@@ -546,27 +494,6 @@ def inject_coa_australia():
 
 
 
-@frappe.whitelist()
-def disable_signup_website():
-	# role_baru = frappe.get_doc({
-	# 	"doctype":"Role",
-	# 	"role_name": "BiSetup Wizard"
-	# })
-	# role_baru.flags.ignore_permissions = True
-	# role_baru.insert()
-
-	ws = frappe.get_single("Website Settings")
-	ws.disable_signup = 1
-	ws.top_bar_items = []
-	ws.flags.ignore_permissions = True
-	ws.save()
-
-
-	# frappe.db.sql(""" UPDATE `tabSingles` s
-	# 	SET s.`value` = "1"
-	# 	WHERE s.`doctype` = "Website Settings"
-	# 	AND s.`field` = "disable_signup" """)
-	# frappe.db.commit()
 
 
 @frappe.whitelist()
@@ -667,197 +594,8 @@ def create_role_baru_dan_system_user_baru():
 	# page_wizard.flags.ignore_permissions = True
 	# page_wizard.save()
 
-@frappe.whitelist()
-def create_user_baru(fullname_user, email, password,plan):
-	# custom andy System Manager user selain administrator
-	setting = frappe.get_single("Additional Settings")
-	user = frappe.get_doc({
-		"doctype":"User",
-		"email" : setting.email_sender,
-		"first_name" : setting.url,
-		"last_name" :"contact",
-
-		"enabled" : 1,
-		"send_welcome_email" : 0,
-		"thread_notify" : 0,
-		"new_password" : "Majuterus234@",
-		"block_modules" : [
-			
-		],
-		"roles" : [
-			{"role" : "System Manager"},
-			# {"role" : "Website Manager"},
-			# {"role" : "Accounts Manager"},
-			# {"role" : "Accounts User"},
-			# {"role" : "HR Manager"},
-			# {"role" : "HR User"},
-			# {"role" : "Item Manager"},
-			# {"role" : "Manufacturing Manager"},
-			# {"role" : "Manufacturing User"},
-			# {"role" : "Purchase Manager"},
-			# {"role" : "Purchase User"},
-			# {"role" : "Projects User"},
-			# {"role" : "Projects Manager"},
-			# {"role" : "Sales Manager"},
-			# {"role" : "Sales User"},
-			# {"role" : "Stock Manager"},
-			# {"role" : "Stock User"},
-			# {"role" : "Sales Master Manager"},
-			# {"role" : "Report Manager"},
-			# {"role" : "All"},
-			# {"role" : "Purchase Master Manager"}
-		],
-	})
-	user.flags.ignore_permissions = True
-	user.insert()
-
-	user = frappe.get_doc({
-		"doctype":"User",
-		"email" : email,
-		"first_name" : fullname_user,
-
-		"enabled" : 1,
-		"send_welcome_email" : 0,
-		"thread_notify" : 0,
-		"new_password" : password,
-		"block_modules" : [
-			
-		],
-		"roles" : [
-			{"role":plan}
-			# {"role" : "System Manager"},
-			# {"role" : "Website Manager"},
-			# {"role" : "Accounts Manager"},
-			# {"role" : "Accounts User"},
-			# {"role" : "HR Manager"},
-			# {"role" : "HR User"},
-			# {"role" : "Item Manager"},
-			# {"role" : "Manufacturing Manager"},
-			# {"role" : "Manufacturing User"},
-			# {"role" : "Purchase Manager"},
-			# {"role" : "Purchase User"},
-			# {"role" : "Projects User"},
-			# {"role" : "Projects Manager"},
-			# {"role" : "Sales Manager"},
-			# {"role" : "Sales User"},
-			# {"role" : "Stock Manager"},
-			# {"role" : "Stock User"},
-			# {"role" : "Sales Master Manager"},
-			# {"role" : "Report Manager"},
-			# {"role" : "All"},
-			# {"role" : "Purchase Master Manager"}
-		],
-	})
-	user.flags.ignore_permissions = True
-	user.insert()
-
-# edited rico
-@frappe.whitelist()
-def create_new_user_on_erp_site(newsitename, email, fullname, password):
-	os.chdir("/home/frappe/frappe-bench")
-	new_site_name = newsitename
-
-	os.system(""" bench --site {} execute my_account.custom_dns_api.create_user_baru_1 --args "['{}','{}','{}']" """.format(newsitename,fullname,email,password))
-
-@frappe.whitelist()
-def create_user_baru_1(fullname_user, email, password):
-	user = frappe.get_doc({
-		"doctype":"User",
-		"email" : email,
-		"first_name" : fullname_user,
-
-		"enabled" : 1,
-		"send_welcome_email" : 0,
-		"thread_notify" : 0,
-		"new_password" : password,
-		"block_modules" : [
-			{"module" : "Agriculture"},
-			{"module" : "BOM"},
-			{"module" : "Chapter"},
-			{"module" : "Contacts"},
-			{"module" : "Core"},
-			{"module" : "Course"},
-			{"module" : "Course Schedule"},
-			{"module" : "Crop"},
-			{"module" : "Crop Cycle"},
-			{"module" : "Desk"},
-			{"module" : "Data Import Tool"},
-			{"module" : "Disease"},
-			{"module" : "Donor"},
-			{"module" : "Education"},
-			{"module" : "Email Inbox"},
-			{"module" : "Fees"},
-			{"module" : "Fertilizer"},
-			{"module" : "File Manager"},
-			{"module" : "Grant Application"},
-			{"module" : "Healthcare"},
-			{"module" : "Hub"},
-			{"module" : "Instructor"},
-			{"module" : "Integrations"},
-			{"module" : "Issue"},
-			{"module" : "Item"},
-			{"module" : "Land Unit"},
-			{"module" : "Lead"},
-			{"module" : "Learn"},
-			{"module" : "Maintenance"},
-			{"module" : "Member"},
-			{"module" : "Non Profit"},
-			{"module" : "Plant Analysis"},
-			{"module" : "Profit and Loss Statement"},
-			{"module" : "Program"},
-			{"module" : "Project"},
-			{"module" : "Projects"},
-			{"module" : "Production Order"},
-			{"module" : "Restaurant"},
-			{"module" : "Room"},
-			{"module" : "Sales Order"},
-			{"module" : "Setup"},
-			{"module" : "Soil Analysis"},
-			{"module" : "Soil Texture"},
-			{"module" : "Student"},
-			{"module" : "Student Applicant"},
-			{"module" : "Student Attendance Tool"},
-			{"module" : "Student Group"},
-			{"module" : "Supplier"},
-			{"module" : "Support"},
-			{"module" : "Task"},
-			{"module" : "ToDo"},
-			{"module" : "Volunteer"},
-			{"module" : "Water Analysis"},
-			{"module" : "Weather"},
-			{"module" : "Website"}
-		],
-		"roles" : [
-			# {"role" : "GMS Support Role"},
-			{"role" : "System Manager"},
-			{"role" : "Website Manager"},
-			{"role" : "Accounts Manager"},
-			{"role" : "Accounts User"},
-			{"role" : "HR Manager"},
-			{"role" : "HR User"},
-			{"role" : "Item Manager"},
-			{"role" : "Manufacturing Manager"},
-			{"role" : "Manufacturing User"},
-			{"role" : "Purchase Manager"},
-			{"role" : "Purchase User"},
-			{"role" : "Sales Manager"},
-			{"role" : "Sales User"},
-			{"role" : "Stock Manager"},
-			{"role" : "Stock User"},
-			{"role" : "Sales Master Manager"},
-			{"role" : "Purchase Master Manager"},
-
-		],
-	})
-	user.flags.ignore_permissions = True
-	user.insert()
 
 
-	# edited rico
-
-	# subject = "Welcome to Crativate"
-	# frappe.sendmail(recipients=domain.user, sender="noreply.crativate@gmail.com", subject=subject,
-	# 		template="test", header=[subject, "green"])
 @frappe.whitelist()
 def set_dekstop_icon_default_untuk_site():
 
@@ -983,25 +721,6 @@ def set_dekstop_icon_default_untuk_site():
 	})
 	desktop_icon.save()
 
-	#
-	# desktop_icon = frappe.get_doc({
-	# 	'doctype': 'Desktop Icon',
-	# 	'idx': 8,
-	# 	'standard': 0,
-	# 	'app': "erpnext",
-	# 	'owner': user_login,
-	# 	'module_name' : "GMS Support",
-	# 	'icon' : "octicon octicon-comment-discussion",
-	# 	'reverse' : 0,
-	# 	'type' : "module",
-	# 	'hidden' : 0,
-	# 	'custom' : 0,
-	# 	'blocked' : 0,
-	# 	'label' : "GMS Support",
-	# 	'color' : "#7f8c8d"
-	# })
-	# desktop_icon.save()
-
 	# pos
 	desktop_icon = frappe.get_doc({
 		'doctype': 'Desktop Icon',
@@ -1025,196 +744,6 @@ def set_dekstop_icon_default_untuk_site():
 	frappe.cache().hdel('desktop_icons', user_login)
 	frappe.cache().hdel('bootinfo', user_login)
 
-
-
-
-@frappe.whitelist()
-def create_new_site_manual():
-
-	newsitename = "example.antusias.id"
-	sitesubdomain = "example"
-	subdomuser = "suprayoto.riconova@gmail.com"
-	subdompass = "asd123"
-	fullname_user = "example"
-
-	os.chdir("/home/frappe/frappe-bench")
-	new_site_name = newsitename
-	site_sub_domain = sitesubdomain
-	#api_call_create_dns(new_site_name)
-
-	os.chdir("/home/frappe/frappe-bench")
-	os.system("sudo su frappe")
-	os.system("bench new-site {} --db-name db_{} --mariadb-root-username root --mariadb-root-password rahasiakita --admin-password @tm286 --install-app erpnext".format(new_site_name,site_sub_domain))
-	# os.system("bench --site {} install-app gms_support".format(new_site_name))
-	# os.system("bench --site {} install-app styling".format(new_site_name))
-
-	os.system("bench setup nginx --yes")
-	os.system("sudo service nginx reload")
-
-	os.system("bench --site {} execute my_account.custom_dns_api.disable_signup_website".format(new_site_name))
-	# os.system("bench --site {} execute my_account.custom_dns_api.create_role_baru_dan_system_user_baru".format(new_site_name))
-	# os.system("bench --site {} execute my_account.custom_dns_api.create_system_user".format(new_site_name))
-	os.system(""" bench --site {} execute my_account.custom_dns_api.create_user_baru --args "['{}','{}','{}']" """.format(newsitename,fullname_user,subdomuser,subdompass))
-
-
-
-
-
-@frappe.whitelist()
-def create_user_baru_manual():
-
-	user = frappe.get_doc({
-		"doctype":"User",
-		"email" : "felix.lasarus@abelgroup.com",
-		"first_name" : "felix",
-		"enabled" : 1,
-		"send_welcome_email" : 0,
-		"thread_notify" : 0,
-		"new_password" : "Rahasiakit@123",
-		"block_modules" : [
-			{"module" : "Agriculture"},
-			{"module" : "BOM"},
-			{"module" : "Chapter"},
-			{"module" : "Contacts"},
-			{"module" : "Core"},
-			{"module" : "Course"},
-			{"module" : "Course Schedule"},
-			{"module" : "Crop"},
-			{"module" : "Crop Cycle"},
-			{"module" : "Desk"},
-			{"module" : "Data Import Tool"},
-			{"module" : "Disease"},
-			{"module" : "Donor"},
-			{"module" : "Education"},
-			{"module" : "Email Inbox"},
-			{"module" : "Fees"},
-			{"module" : "Fertilizer"},
-			{"module" : "File Manager"},
-			{"module" : "Grant Application"},
-			{"module" : "Healthcare"},
-			{"module" : "Hub"},
-			{"module" : "Instructor"},
-			{"module" : "Integrations"},
-			{"module" : "Issue"},
-			{"module" : "Item"},
-			{"module" : "Land Unit"},
-			{"module" : "Lead"},
-			{"module" : "Learn"},
-			{"module" : "Maintenance"},
-			{"module" : "Member"},
-			{"module" : "Non Profit"},
-			{"module" : "Plant Analysis"},
-			{"module" : "Profit and Loss Statement"},
-			{"module" : "Program"},
-			{"module" : "Project"},
-			{"module" : "Projects"},
-			{"module" : "Production Order"},
-			{"module" : "Restaurant"},
-			{"module" : "Room"},
-			{"module" : "Sales Order"},
-			{"module" : "Setup"},
-			{"module" : "Soil Analysis"},
-			{"module" : "Soil Texture"},
-			{"module" : "Student"},
-			{"module" : "Student Applicant"},
-			{"module" : "Student Attendance Tool"},
-			{"module" : "Student Group"},
-			{"module" : "Supplier"},
-			{"module" : "Support"},
-			{"module" : "Task"},
-			{"module" : "ToDo"},
-			{"module" : "Volunteer"},
-			{"module" : "Water Analysis"},
-			{"module" : "Weather"},
-			{"module" : "Website"}
-		],
-		"roles" : [
-			# {"role" : "GMS Support Role"},
-			{"role" : "System Manager"},
-			{"role" : "Website Manager"},
-			{"role" : "Accounts Manager"},
-			{"role" : "Accounts User"},
-			{"role" : "HR Manager"},
-			{"role" : "HR User"},
-			{"role" : "Item Manager"},
-			{"role" : "Manufacturing Manager"},
-			{"role" : "Manufacturing User"},
-			{"role" : "Purchase Manager"},
-			{"role" : "Purchase User"},
-			{"role" : "Sales Manager"},
-			{"role" : "Sales User"},
-			{"role" : "Stock Manager"},
-			{"role" : "Stock User"},
-			{"role" : "Sales Master Manager"},
-			{"role" : "Purchase Master Manager"},
-
-		],
-	})
-	user.flags.ignore_permissions = True
-	user.save()
-
-	# user = frappe.get_doc({
-	# 	"doctype":"User",
-	# 	"email" : "cs@antusias.id",
-	# 	"first_name" : "Administrator",
-
-	# 	"enabled" : 1,
-	# 	"send_welcome_email" : 0,
-	# 	"thread_notify" : 0,
-	# 	"new_password" : "asd123",
-	# 	"block_modules" : [
-	# 	],
-	# 	"roles" : [
-	# 		# {"role" : "GMS Support Role"},
-	# 		{"role" : "System Manager"}
-
-	# 	],
-	# })
-	# user.flags.ignore_permissions = True
-	# user.save()
-
-
-
-
-# custom buat API DMJ
-
-@frappe.whitelist()
-def get_customer_primary_contact(customer):
-	customer = customer
-	return frappe.db.sql("""
-		select `tabContact`.name from `tabContact`, `tabDynamic Link`
-			where `tabContact`.name = `tabDynamic Link`.parent and `tabDynamic Link`.link_name = %(customer)s
-			and `tabDynamic Link`.link_doctype = 'Customer' and `tabContact`.is_primary_contact = 1
-			
-		""", {
-			'customer': customer
-		})
-
-
-@frappe.whitelist()
-def get_customer_primary_address(customer):
-	customer = customer
-	return frappe.db.sql("""
-		select `tabAddress`.name from `tabAddress`, `tabDynamic Link`
-			where `tabAddress`.name = `tabDynamic Link`.parent and `tabDynamic Link`.link_name = %(customer)s
-			and `tabDynamic Link`.link_doctype = 'Customer' and `tabAddress`.is_primary_address = 1
-			
-		""", {
-			'customer': customer
-		})
-
-
-@frappe.whitelist()
-def get_customer_shipping_address(customer):
-	customer = customer
-	return frappe.db.sql("""
-		select `tabAddress`.name from `tabAddress`, `tabDynamic Link`
-			where `tabAddress`.name = `tabDynamic Link`.parent and `tabDynamic Link`.link_name = %(customer)s
-			and `tabDynamic Link`.link_doctype = 'Customer' and `tabAddress`.is_shipping_address = 1
-			
-		""", {
-			'customer': customer
-		})
 
 @frappe.whitelist()
 def setup_solubis_fixtures():
