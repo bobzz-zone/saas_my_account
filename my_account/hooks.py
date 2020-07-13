@@ -80,11 +80,11 @@ app_license = "MIT"
 # Hook on document methods and events
 #
 doc_events = {
-	"User": {
-		"on_update": "my_account.my_account.doctype.custom_method.validate_user_quota"
+#	"User": {
+#		"on_update": "my_account.my_account.doctype.custom_method.validate_user_quota"
 		# "on_submit": "my_account.custom_dns_api.take_new_site"
 		# "on_submit" : my_account.doctype.sync_server_settings.create_new_user
-	}
+#	}
 }
 
 # Scheduled Tasks
