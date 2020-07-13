@@ -117,9 +117,7 @@ def payment_success_with_payment_gateway(invoice):
 				tidaklengkap = subdom_name
 				# create site setelah user bayar (flow no trial)
 				enqueue("my_account.custom_dns_api.create_new_site_subprocess", newsitename=lengkap, sitesubdomain=subdom_name, subdomuser=_subdomain.user,  fullname_user=full_name)
-			_subdomain.disable_if_not_pay = 0
-
-			
+			_subdomain.disable_if_not_pay = 0	
 
 		if i.type == "Add Quota":
 			print('add quota')

@@ -104,16 +104,17 @@ def create_new_site_subprocess(newsitename,sitesubdomain, subdomuser, fullname_u
 
 	os.chdir("/home/frappe/frappe-bench")
 	os.system("sudo su frappe")
-	os.system("bench new-site {} --db-name db_{} --mariadb-root-username root --mariadb-root-password majuterus234@ --admin-password @tm21D4$ --install-app erpnext --install-app solubis_brand".format(new_site_name,site_sub_domain))
+	os.system("bench new-site {} --db-name db_{} --mariadb-root-username root --mariadb-root-password majuterus234@ --admin-password majuterus234@ --install-app erpnext --install-app solubis_brand".format(new_site_name,site_sub_domain))
 	
-	os.system("bench setup nginx --yes")
-	os.system("sudo service nginx reload")
+	#os.system("bench setup nginx --yes")
+	#os.system("sudo service nginx reload")
 
 	os.system("bench --site {} execute my_account.custom_dns_api.disable_signup_website".format(new_site_name))
 	#edited comment bobby
-	os.system(""" bench --site {} execute my_account.custom_dns_api.create_user_baru --args "['{}','{}','{}','{}']" """.format(newsitename,fullname_user,subdomuser,subdompass,plan))
+	os.system(""" bench --site {} execute my_account.custom_dns_api.create_user_baru --args "['{}','{}','{}','{}']" 
+		""".format(newsitename,fullname_user,subdomuser,subdompass,plan))
 	#end of line
-	os.system("bench --site {} migrate".format(new_site_name))
+	#os.system("bench --site {} migrate".format(new_site_name))
 
 	# os.system("bench --site {} execute my_account.custom_dns_api.rebuild_tree_error".format(new_site_name))
 	os.system("bench --site {} execute my_account.custom_fixtures.import_fixtures".format(new_site_name))
@@ -757,8 +758,6 @@ def create_new_user_on_erp_site(newsitename, email, fullname, password):
 	new_site_name = newsitename
 
 	os.system(""" bench --site {} execute my_account.custom_dns_api.create_user_baru_1 --args "['{}','{}','{}']" """.format(newsitename,fullname,email,password))
-
-
 
 @frappe.whitelist()
 def create_user_baru_1(fullname_user, email, password):

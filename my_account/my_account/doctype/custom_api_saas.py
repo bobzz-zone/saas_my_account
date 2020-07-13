@@ -23,7 +23,7 @@ class custom_method(Document):
 	pass
 
 @frappe.whitelist(allow_guest=True)
-def sign_up(email, full_name , subdomain, phone, plan, periodic, redirect_to):
+def sign_up(email, full_name , subdomain, phone, plan,password, periodic, redirect_to):
 	setting = frappe.get_single("Additional Settings")
 	if not redirect_to:
 		redirect_to=setting.billing_url
@@ -48,7 +48,7 @@ def sign_up(email, full_name , subdomain, phone, plan, periodic, redirect_to):
 				_('Too many users signed up recently, so the registration is disabled. Please try back in an hour'),
 				http_status_code=429)
 
-		from frappe.utils import random_string
+		
 		
 		# flow without trial
 
@@ -106,6 +106,7 @@ def sign_up(email, full_name , subdomain, phone, plan, periodic, redirect_to):
 		purchase_user.price_list = plan
 		purchase_user.flags.ignore_permissions = True
 		purchase_user.owner = email
+		purchase_user.current_password =password
 		purchase_user.save()
 
 		user = frappe.get_doc({
@@ -114,7 +115,7 @@ def sign_up(email, full_name , subdomain, phone, plan, periodic, redirect_to):
 			"first_name": full_name,
 			"enabled": 1,
 			"send_welcome_email" :0,
-			"new_password": random_string(10),
+			"new_password": password,
 			"user_type": "Website User",
 			"phone": phone,
 			# "subdomain" : subdomain.lower(),
