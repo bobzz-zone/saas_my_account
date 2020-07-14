@@ -356,7 +356,6 @@ def invoice_paid(**data):
 
 		_subdomain = frappe.get_doc("Master Subdomain", data_invoice.subdomain)
 
-		os.chdir("/home/frappe/frappe-bench")
 
 		for i in data_invoice.invoice_item :
 			if i.type == "New User" or i.type == "Perpanjangan User" :
@@ -380,6 +379,7 @@ def invoice_paid(**data):
 					email = _subdomain.user
 					tidaklengkap = subdom_name
 					# create site setelah user bayar (flow no trial)
+					os.chdir("/home/frappe/frappe-bench")
 					enqueue("my_account.custom_dns_api.create_new_site_subprocess", newsitename=lengkap, sitesubdomain=subdom_name, subdomuser=_subdomain.user,  fullname_user=full_name)
 				_subdomain.disable_if_not_pay = 0	
 
@@ -392,9 +392,8 @@ def invoice_paid(**data):
 				subdom_name = _subdomain.name.lower()
 				lengkap = "{}.solubis.id".format(subdom_name)
 				full_name = frappe.db.get_value("User", _subdomain.user, 'full_name')
+				os.chdir("/home/frappe/frappe-bench")
 				enqueue("my_account.custom_dns_api.create_new_site_subprocess", newsitename=lengkap, sitesubdomain=subdom_name, subdomuser=_subdomain.user,  fullname_user=full_name)
-
-
 			if i.type == "Add Module":
 				print("Add Module")
 				mods = i.fullname.split(",")
@@ -404,6 +403,7 @@ def invoice_paid(**data):
 			if i.type == "Perpanjangan":
 				_subdomain.disable_if_not_pay = 0
 				_subdomain.on_trial = 0
+				_subdomain.block=0
 
 		_subdomain.save(ignore_permissions=True)
 

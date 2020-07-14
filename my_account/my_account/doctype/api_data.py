@@ -328,29 +328,20 @@ def auto_invoice_yearly():
 
 
 def set_site_disabled():
-	subdomain_list = frappe.db.sql("select * FROM `tabMaster Subdomain` where disable_if_not_pay = 1 and extend_trial = 0",as_dict=1)
-	for subdomain in subdomain_list:
-		site = "{}.solubis.id".format(subdomain.name)
-		# f = open("./sites/{}/site_config.json".format(site),"w")
-		data = ""
+	subdomain_list = frappe.db.sql("update `tabMaster Subdomain` set block=1 where disable_if_not_pay = 1 and extend_trial = 0",as_dict=1)
+	# for subdomain in subdomain_list:
+	# 	site = "{}.solubis.id".format(subdomain.name)
+	# 	# f = open("./sites/{}/site_config.json".format(site),"w")
+	# 	data = ""
 
-		# disable site
-		with open("/home/frappe/frappe-bench/sites/{}/site_config.json".format(site)) as read_file:
-			data = json.load(read_file)
-			data.update({"site_disabled":1})
+	# 	# disable site
+	# 	with open("/home/frappe/frappe-bench/sites/{}/site_config.json".format(site)) as read_file:
+	# 		data = json.load(read_file)
+	# 		data.update({"site_disabled":1})
 
-		with open("/home/frappe/frappe-bench/sites/{}/site_config.json".format(site),"w") as write_file:
-			json.dump(data,write_file, indent=2)
+	# 	with open("/home/frappe/frappe-bench/sites/{}/site_config.json".format(site),"w") as write_file:
+	# 		json.dump(data,write_file, indent=2)
 
-		# from frappe.installer import update_site_config
-		# site = get_site(context)
-		# print(site)
-		# try:
-		# 	frappe.init(site="coba1.solubis.id")
-		# 	update_site_config('site_disabled', 1)
-
-		# finally:
-		# 	frappe.destroy()
 
 @frappe.whitelist()
 def remove_extend_trial():
