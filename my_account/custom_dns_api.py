@@ -79,17 +79,10 @@ def create_new_site_subprocess(newsitename,sitesubdomain, subdomuser, fullname_u
 	os.system("bench --site {} execute solubis_brand.custom_function.disable_signup_website".format(new_site_name))
 	os.system("bench --site {} execute solubis_brand.custom_function.import_fixtures".format(new_site_name))
 	#edited comment bobby
+	os.system(""" bench --site {} execute solubis_brand.custom_function.disable_other_roles --args "['{}']" """.format(plan))
 	os.system("""bench --site {} execute solubis_brand.custom_function.create_user_baru --args "['{}','{}','{}','{}']" 
 		""".format(newsitename,fullname_user,subdomuser,subdompass,plan))
-
-	#end of line
-
-	# disable other roles except for purchased plan
-	os.system(""" bench --site {} execute solubis_brand.custom_function.disable_other_roles --args "['{}']" """.format(plan))
-
-	# sbd = frappe.get_doc("Master Subdomain", sitesubdomain)
-	# sbd.is_created = 1
-	# sbd.save(ignore_permissions=True)
+	
 	frappe.db.sql("""update `tabMaster Subdomain` set is_created = 1 where name = '{}' """.format(sitesubdomain))
 	frappe.db.commit()
 	enqueue("my_account.custom_dns_api.send_mail_site_created",subdomuser=subdomuser,fullname=fullname_user,newsitename=newsitename)

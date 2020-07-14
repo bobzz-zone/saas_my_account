@@ -8,7 +8,6 @@ from frappe.model.document import Document
 import os
 import requests
 import json
-import subprocess
 from frappe.utils.background_jobs import enqueue
 from frappe.utils import strip, cint, today
 from frappe import throw, msgprint, _
