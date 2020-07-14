@@ -148,7 +148,7 @@ def sign_up(email, full_name , subdomain, phone, plan,password, periodic, redire
 		sdm.on_trial = 0
 		sdm.periodic = periodic
 		sdm.flags.ignore_permissions = True
-		sdm.fullname=fullname
+		sdm.fullname=full_name
 		sdm.password=password
 		sdm.save()
 
