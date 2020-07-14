@@ -69,6 +69,8 @@ def create_new_site_subprocess(newsitename,sitesubdomain, subdomuser, fullname_u
 	plan = frappe.db.get_value("Master Subdomain",sitesubdomain,"active_plan")
 
 
+	frappe.db.sql("""update `tabMaster Subdomain` set is_created = 1 where name = '{}' """.format(sitesubdomain))
+	frappe.db.commit()
 	os.chdir("/home/frappe/frappe-bench")
 	os.system("sudo su frappe")
 	os.system("bench new-site {} --db-name db_{} --mariadb-root-username root --mariadb-root-password majuterus234@ --admin-password majuterus234@ --install-app erpnext --install-app solubis_brand".format(new_site_name,site_sub_domain))
@@ -82,12 +84,8 @@ def create_new_site_subprocess(newsitename,sitesubdomain, subdomuser, fullname_u
 	#os.system("""bench --site {} execute solubis_brand.custom_function.create_user_baru --args "['{}','{}','{}','{}']" 
 	#	""".format(newsitename,fullname_user,subdomuser,subdompass,plan))
 
-	frappe.db.sql("""update `tabMaster Subdomain` set is_created = 1 where name = '{}' """.format(sitesubdomain))
-	frappe.db.commit()
-	enqueue("my_account.custom_dns_api.send_mail_site_created",subdomuser=subdomuser,fullname=fullname_user,newsitename=newsitename)
 
-
-@frappe.whitelist()
+@frappe.whitelist(allow_guest=True)
 def send_mail_site_created(subdomuser, fullname, newsitename):
 	setting = frappe.get_single("Additional Settings")
 	subject = "Welcome to {}".format(setting.url)

@@ -20,7 +20,3 @@ frappe/utils/install.py line 139 ... add IDR
 frappe/desk/page/setup_wizard/setup_wizard.js remove //profile user section
 
 frappe/desk/page/setup_wizard/setup_wizard.py remove line 89 (update_user_name)
-
-set hooks validate user pada brand app
-
-custom_dns_api.py change brand app + copy custom function for brand app
