@@ -336,29 +336,84 @@ def create_xendit_invoice(invoice=None, desc=None):
 		frappe.throw("""Error {}""".format(result))
 
 @frappe.whitelist(allow_guest=True)
-def invoice_paid(data):
-	# print(data['external_id'])
-	# detail = json.loads(data)
-	# inv = frappe.get_doc("Invoice", data["external_id"])
-	# print(data["external_id"])
-	# print(data)
+def invoice_paid(**data):
 	print(data['status'])
 	print(data['merchant_name'])
-	# return "Successful"
-	# return "Successful"
-	# print(inv.name)
 	if data['status'] == "PAID" and data['merchant_name'] == 'PT Digital Asia Solusindo':
-	# if data['status'] == "PAID":
 
+		# os.chdir("/home/frappe/frappe-bench")
+		# os.system("""bench --site reg.solubis.id execute my_account.my_account.doctype.custom_api_payment.payment_success_with_payment_gateway --args '["{}"]' """.format(data['external_id']))
+		note_payment = "Xendit"
+		# mengubah invoice menjadi paid
+		data_invoice = frappe.get_doc("Invoice", data['external_id'])
+		data_invoice.status = "Paid"
+		data_invoice.paid_date = today()
+		data_invoice.status_payment = "Success"
+		data_invoice.flags.ignore_permissions = True
+		data_invoice.save()
+		# mengaktifkan user
+
+		_subdomain = frappe.get_doc("Master Subdomain", data_invoice.subdomain)
 
 		os.chdir("/home/frappe/frappe-bench")
-		os.system("""bench --site reg.solubis.id execute my_account.my_account.doctype.custom_api_payment.payment_success_with_payment_gateway --args '["{}"]' """.format(data['external_id']))
-		
-		# frappe.db.sql("""UPDATE `tabInvoice` set paid_date = '{}' where name = '{}' """.format(today(),data['external_id']))
-		# frappe.db.commit()
 
-		# receipt_mail(data['external_id'])
+		for i in data_invoice.invoice_item :
+			if i.type == "New User" or i.type == "Perpanjangan User" :
 
+				user = i.description
+				price_list = frappe.get_doc("Price List", i.price_list)
+
+				data_user = frappe.get_doc("Purchase User", user)
+				data_user.enabled = 1
+				data_user.status = "Paid"
+				data_user.days_active = price_list.active_days
+				data_user.flags.ignore_permissions = True
+				data_user.save()
+
+				lengkap = "{}.solubis.id".format(data_invoice.subdomain)
+				if _subdomain.is_created == 0:
+					subdom_name = _subdomain.name.lower()
+					lengkap = "{}.solubis.id".format(subdom_name)
+					full_name = frappe.db.get_value("User", _subdomain.user, 'full_name')
+
+					email = _subdomain.user
+					tidaklengkap = subdom_name
+					# create site setelah user bayar (flow no trial)
+					enqueue("my_account.custom_dns_api.create_new_site_subprocess", newsitename=lengkap, sitesubdomain=subdom_name, subdomuser=_subdomain.user,  fullname_user=full_name)
+				_subdomain.disable_if_not_pay = 0	
+
+			if i.type == "Add Quota":
+				print('add quota')
+				_subdomain.quota = _subdomain.quota + int(data_invoice.total_user)
+
+			if i.type == "Add Subdomain":
+				print('add subdomain')
+				subdom_name = _subdomain.name.lower()
+				lengkap = "{}.solubis.id".format(subdom_name)
+				full_name = frappe.db.get_value("User", _subdomain.user, 'full_name')
+				enqueue("my_account.custom_dns_api.create_new_site_subprocess", newsitename=lengkap, sitesubdomain=subdom_name, subdomuser=_subdomain.user,  fullname_user=full_name)
+
+
+			if i.type == "Add Module":
+				print("Add Module")
+				mods = i.fullname.split(",")
+				for x in mods:
+					_subdomain.append("active_modules",{"module":x})
+
+			if i.type == "Perpanjangan":
+				_subdomain.disable_if_not_pay = 0
+				_subdomain.on_trial = 0
+
+		_subdomain.save(ignore_permissions=True)
+
+		history_payment = frappe.new_doc("History Payment")
+		history_payment.posting_date = utils.today()
+		history_payment.subdomain = data_invoice.subdomain
+		history_payment.invoice = data['external_id']
+		history_payment.paid_amount = data_invoice.grand_total
+		history_payment.note = note_payment
+		history_payment.flags.ignore_permissions = True
+		history_payment.save()
 		return "Successful"
 
 	if data['status'] == "EXPIRED":
