@@ -320,8 +320,8 @@ def create_xendit_invoice(invoice=None, desc=None):
 	description = """ description="{}" """.format(desc)
 	success_redirect = """ success_redirect_url="{}" """.format("https://billing.solubis.id/login")
 
-	response = subprocess.check_output("""curl https://api.xendit.co/v2/invoices -X POST -u {} -d {} -d {} -d {} -d {}
-			""".format(secret_key, external_id, payer_email, description, amount),shell=True, universal_newlines=True)
+	response = subprocess.check_output("""curl https://api.xendit.co/v2/invoices -X POST -u {} -d {} -d {} -d {} -d {} -d {}
+			""".format(secret_key, external_id, payer_email, description, amount,success_redirect),shell=True, universal_newlines=True)
 
 	result = json.loads(response)
 
