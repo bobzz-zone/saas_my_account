@@ -68,11 +68,12 @@ def update_quota(_subdomain, new_quota):
 		ch = inv.append('invoice_item', {})
 		ch.type = "Add Quota"
 
-		inv.save()
 		desc = "Invoice for subdomain {}, add quota {}".format(inv.subdomain,quota)
+		inv.desc=desc
+		inv.save()
 		# return create_xendit_invoice(inv.name, desc)
 		link = create_xendit_invoice(inv.name,desc)
-		return 1, _("After invoice paid, quota will be up to date.<br>Here is link to pay invoice {} ".format(link))
+		return 1, link
 	else:
 		
 		if float(active_user) > float(new_quota):
@@ -107,7 +108,7 @@ def enabled_user(subdomain):
 	return stream
 
 @frappe.whitelist()
-def add_subdomain(subdomain,email, plan,periodic):
+def add_subdomain(subdomain,email,password, plan,periodic):
 	setting = frappe.get_single("Additional Settings")
 	plist = frappe.get_doc("Price List",plan)
 	full_name = frappe.db.get_value("User", email, "full_name")
@@ -117,9 +118,13 @@ def add_subdomain(subdomain,email, plan,periodic):
 	sdm.is_created = 0
 	sdm.user = email
 	sdm.active_plan = plan
+	sdm.disable_if_not_pay = 1
+	sdm.on_trial = 0
 	sdm.quota = plist.user_qty
 	sdm.periodic = periodic
 	sdm.flags.ignore_permissions = True
+	sdm.fullname=full_name
+	sdm.password=password
 	sdm.save()
 
 	inv = frappe.new_doc("Invoice")
@@ -156,11 +161,12 @@ def add_subdomain(subdomain,email, plan,periodic):
 	inv.discount = 0
 	inv.grand_total = total
 	inv.flags.ignore_permissions = True
-	inv.save()
 	desc = "Invoice for user {}, add subdomain {}.{}".format(email,subdomain,setting.url)
+	inv.desc=desc
+	inv.save()
 
 	link = create_xendit_invoice(inv.name,desc)
-	return 1, _("Here is link to pay invoice {} ".format(link))
+	return 1, link
 
 @frappe.whitelist(allow_guest=True)
 def get_active_modules(subdomain):
@@ -241,11 +247,11 @@ def update_module(subdomain, enable_module):
 		ch = inv.append('invoice_item', {})
 		ch.type = "Add Module"
 		ch.fullname = enable_module
-
-		inv.save()
 		desc = "Invoice for site {}, add module {}".format(subdomain,enable_module)
+		inv.desc=desc
+		inv.save()
 		link = create_xendit_invoice(inv.name,desc)
-		return 1, _("After invoice paid, quota will be up to date. <br> Here is link to pay invoice {} ".format(link))
+		return 1, link
 
 
 	# return subdomain,enable_module
@@ -284,8 +290,9 @@ def auto_invoice_monthly():
 		inv.discount = 0
 		inv.grand_total = inv.total
 		inv.flags.ignore_permissions = True
-		inv.save()
 		desc = "Invoice for user {}, add subdomain {}.{}".format(subdomain.user,subdomain.name,setting.url)
+		inv.desc=desc
+		inv.save()
 		create_xendit_invoice(inv.name, desc)
 
 def auto_invoice_yearly():
@@ -322,8 +329,9 @@ def auto_invoice_yearly():
 		inv.discount = 0
 		inv.grand_total = int(plist.normal_price + int(get_price_per_quota())*int(subdomain.quota) + total_module) * 12
 		inv.flags.ignore_permissions = True
-		inv.save()
 		desc = "Invoice for user {}, add subdomain {}.{}".format(subdomain.user,subdomain.name,setting.url)
+		inv.desc=desc
+		inv.save()
 		create_xendit_invoice(inv.name, desc)
 
 

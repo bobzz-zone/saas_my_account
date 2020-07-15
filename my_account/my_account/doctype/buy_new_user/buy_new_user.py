@@ -286,28 +286,19 @@ def buy_user(posting_date, subdomain, new_users):
 				""".format(invoice.name)
 
 			invoice2.flags.ignore_permissions = True
+			desc = """ Invoice telah terbuat {0} untuk subdomain {1} atas nama {2} """.format(invoice.name, invoice.subdomain, invoice.owner)
+			invoice2.desc=desc
 			invoice2.save()
 
-
-
-			# frappe.msgprint(""" Invoice telah terbuat {0}, silahkan membayar untuk mengaktifkan user yang anda buat """.format(invoice.name))
-			# return """ Invoice telah terbuat {0}, silahkan membayar untuk mengaktifkan user yang anda buat """.format(invoice.name)
-			desc = """ Invoice telah terbuat {0} untuk subdomain {1} atas nama {2} """.format(invoice.name, invoice.subdomain, invoice.owner)
-			
 			# untuk xendit
 			return create_xendit_invoice(invoice.name,desc)
 
-
-			# return """ {},{},{},{} """.format(invoice.name, invoice.owner, invoice.total,desc)
-
-			# self.buy_new_user_item = []
-			# self.total = 0
 
 	else :
 		frappe.throw("Data User harus diisi terlebih dahulu")
 
 @frappe.whitelist(allow_guest=True)
-def create_xendit_invoice(invoice=None, desc=None):
+def create_xendit_invoice(invoice=None, desc=None,redirect_to=None):
 	if invoice:
 		_invoice = frappe.get_doc("Invoice",invoice)
 	else:
@@ -319,7 +310,9 @@ def create_xendit_invoice(invoice=None, desc=None):
 	payer_email = """ payer_email="{}" """.format(_invoice.owner)
 	amount = """ amount={}""".format(_invoice.total)
 	description = """ description="{}" """.format(desc)
-	success_redirect = """ success_redirect_url="{}" """.format("https://billing.solubis.id/login")
+	if not redirect_to:
+		redirect_to="https://billing.solubis.id/dashboard"
+	success_redirect = """ success_redirect_url="{}" """.format(redirect_to)
 
 	response = subprocess.check_output("""curl https://api.xendit.co/v2/invoices -X POST -u {} -d {} -d {} -d {} -d {} -d {}
 			""".format(secret_key, external_id, payer_email, description, amount,success_redirect),shell=True, universal_newlines=True)
