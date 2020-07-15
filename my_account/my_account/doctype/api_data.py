@@ -109,7 +109,7 @@ def enabled_user(subdomain):
 @frappe.whitelist()
 def add_subdomain(subdomain,email, plan,periodic):
 	setting = frappe.get_single("Additional Settings")
-	plist = frappe.get_doc("Price List",solubis_plan)
+	plist = frappe.get_doc("Price List",plan)
 	full_name = frappe.db.get_value("User", email, "full_name")
 	# create subdomain
 	sdm = frappe.new_doc("Master Subdomain")
