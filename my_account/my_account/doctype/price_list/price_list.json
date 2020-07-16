@@ -8,13 +8,10 @@
  "field_order": [
   "disabled",
   "price_list",
-  "active_days",
   "normal_price",
   "discount_price",
   "yearly_price",
-  "ppn",
   "cb1",
-  "price_list_type",
   "user_qty",
   "benefit"
  ],
@@ -34,12 +31,6 @@
    "unique": 1
   },
   {
-   "fieldname": "active_days",
-   "fieldtype": "Int",
-   "label": "Active Days",
-   "reqd": 1
-  },
-  {
    "fieldname": "normal_price",
    "fieldtype": "Currency",
    "in_list_view": 1,
@@ -54,22 +45,8 @@
    "reqd": 1
   },
   {
-   "fieldname": "ppn",
-   "fieldtype": "Select",
-   "label": "PPN",
-   "options": "\nInclude\nExclude",
-   "reqd": 1
-  },
-  {
    "fieldname": "cb1",
    "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "price_list_type",
-   "fieldtype": "Select",
-   "label": "Price List Type",
-   "options": "Single User\nPackage User",
-   "reqd": 1
   },
   {
    "fieldname": "user_qty",
@@ -89,7 +66,7 @@
    "label": "Yearly Price"
   }
  ],
- "modified": "2020-07-02 22:42:05.402257",
+ "modified": "2020-07-16 19:51:11.038153",
  "modified_by": "Administrator",
  "module": "My Account",
  "name": "Price List",
