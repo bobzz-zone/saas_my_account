@@ -36,7 +36,8 @@
   "status_payment",
   "sync_domain",
   "xendit_url",
-  "xendit_code"
+  "xendit_code",
+  "desc"
  ],
  "fields": [
   {
@@ -219,10 +220,15 @@
    "fieldname": "xendit_code",
    "fieldtype": "Read Only",
    "label": "Xendit Code"
+  },
+  {
+   "fieldname": "desc",
+   "fieldtype": "Small Text",
+   "label": "Description"
   }
  ],
  "hide_toolbar": 1,
- "modified": "2020-06-22 21:15:05.928452",
+ "modified": "2020-07-15 23:57:16.977401",
  "modified_by": "Administrator",
  "module": "My Account",
  "name": "Invoice",

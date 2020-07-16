@@ -14,7 +14,10 @@
   "periodic",
   "disable_if_not_pay",
   "on_trial",
-  "extend_trial"
+  "extend_trial",
+  "password",
+  "fullname",
+  "block"
  ],
  "fields": [
   {
@@ -82,9 +85,25 @@
    "fieldname": "extend_trial",
    "fieldtype": "Check",
    "label": "Extend Trial"
+  },
+  {
+   "fieldname": "password",
+   "fieldtype": "Data",
+   "label": "Starting Password"
+  },
+  {
+   "fieldname": "fullname",
+   "fieldtype": "Data",
+   "label": "Full Name"
+  },
+  {
+   "default": "0",
+   "fieldname": "block",
+   "fieldtype": "Check",
+   "label": "Block Login"
   }
  ],
- "modified": "2020-07-10 10:32:43.939265",
+ "modified": "2020-07-14 23:54:49.480552",
  "modified_by": "Administrator",
  "module": "My Account",
  "name": "Master Subdomain",

@@ -7,6 +7,8 @@
   "url",
   "billing_url",
   "price_quota",
+  "email_sender",
+  "xendit",
   "section_break_2",
   "modules"
  ],
@@ -37,10 +39,20 @@
    "fieldname": "billing_url",
    "fieldtype": "Data",
    "label": "Billing URL"
+  },
+  {
+   "fieldname": "email_sender",
+   "fieldtype": "Data",
+   "label": "Email Sender"
+  },
+  {
+   "fieldname": "xendit",
+   "fieldtype": "Data",
+   "label": "Xendit Key"
   }
  ],
  "issingle": 1,
- "modified": "2020-07-11 19:41:44.726239",
+ "modified": "2020-07-16 17:08:28.301354",
  "modified_by": "Administrator",
  "module": "My Account",
  "name": "Additional Settings",
