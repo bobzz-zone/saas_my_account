@@ -17,7 +17,6 @@ import re
 from my_account.my_account.doctype.buy_new_user.buy_new_user import create_xendit_invoice
 from frappe.utils import get_url
 import json
-from frappe.utils.user import get_user_fullname
 
 class custom_method(Document):
 	pass
