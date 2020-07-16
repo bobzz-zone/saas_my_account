@@ -303,19 +303,20 @@ def create_xendit_invoice(invoice=None, desc=None,redirect_to=None):
 		_invoice = frappe.get_doc("Invoice",invoice)
 	else:
 		return "Invoice not found"
+	setting = frappe.get_single("Additional Settings")
 	# desc = "coba aja z"
 	# secret_key = "xnd_production_qXyMROfECQOTStkkyEVg1xTLfpsc5rty2MSUHJVla1jyAZbZoG97tOod9qSXl:"
-	secret_key = "xnd_development_SmS5uOy95uoosiId9BaTSPmQbqM8AaAQQMMwlSsg7LtgUEIslleo8MbWov97Gye:"
+	#secret_key = "xnd_development_SmS5uOy95uoosiId9BaTSPmQbqM8AaAQQMMwlSsg7LtgUEIslleo8MbWov97Gye:"
 	external_id = """ external_id="{}" """.format(_invoice.name)
 	payer_email = """ payer_email="{}" """.format(_invoice.owner)
 	amount = """ amount={}""".format(_invoice.total)
 	description = """ description="{}" """.format(desc)
 	if not redirect_to:
-		redirect_to="https://billing.solubis.id/dashboard"
+		redirect_to="{}dashboard".format(setting.billing_url)
 	success_redirect = """ success_redirect_url="{}" """.format(redirect_to)
 
 	response = subprocess.check_output("""curl https://api.xendit.co/v2/invoices -X POST -u {} -d {} -d {} -d {} -d {} -d {}
-			""".format(secret_key, external_id, payer_email, description, amount,success_redirect),shell=True, universal_newlines=True)
+			""".format(setting.xendit, external_id, payer_email, description, amount,success_redirect),shell=True, universal_newlines=True)
 
 	result = json.loads(response)
 
