@@ -61,11 +61,11 @@ def sign_up(email, full_name , subdomain, phone, plan,password, periodic, redire
 		total = 0
 
 		if periodic == "Monthly":
-			days_left = date_diff(get_last_day(today()),today()) + 1
+			days_left = date_diff(get_last_day(today()),today())
 			total = int(int(plist.normal_price) * days_left/30)
 		# full_days = date_diff(get_last_day(today()),get_first_day(utils.today())) + 1
 		else:
-			days_left = date_diff(get_last_day(today()),today()) + 1
+			days_left = date_diff(get_last_day(today()),today())
 			year = utils.today().split("-")[0]
 			months_left = utils.month_diff("{}-12-31".format(year),utils.today()) - 1
 			cur_mth = int(int(plist.normal_price) * days_left/30)
