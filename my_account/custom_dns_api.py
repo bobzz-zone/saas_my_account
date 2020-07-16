@@ -734,9 +734,3 @@ def set_dekstop_icon_default_untuk_site():
 	frappe.cache().hdel('desktop_icons', user_login)
 	frappe.cache().hdel('bootinfo', user_login)
 
-
-@frappe.whitelist()
-def setup_solubis_fixtures():
-	import_doc(frappe.get_app_path("my_account", "fixtures", "property_setter.json"), ignore_links=False, overwrite=True)
-	import_doc(frappe.get_app_path("my_account", "fixtures", "custom_docperm.json"), ignore_links=False, overwrite=True)
-	import_doc(frappe.get_app_path("my_account", "fixtures", "role.json"), ignore_links=False, overwrite=True)

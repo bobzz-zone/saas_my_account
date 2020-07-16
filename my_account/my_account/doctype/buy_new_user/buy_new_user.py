@@ -336,8 +336,6 @@ def invoice_paid(**data):
 	print(data['merchant_name'])
 	if data['status'] == "PAID" and data['merchant_name'] == 'PT Digital Asia Solusindo':
 
-		# os.chdir("/home/frappe/frappe-bench")
-		# os.system("""bench --site reg.solubis.id execute my_account.my_account.doctype.custom_api_payment.payment_success_with_payment_gateway --args '["{}"]' """.format(data['external_id']))
 		note_payment = "Xendit"
 		# mengubah invoice menjadi paid
 		data_invoice = frappe.get_doc("Invoice", data['external_id'])
@@ -422,8 +420,8 @@ def receipt_mail(invoice):
 	subdomain = frappe.db.get_value("Invoice", invoice, 'subdomain')
 	template = frappe.get_doc("Receipt Template", subdomain)
 	
-	sender = 'no-reply@antzman.com'
-	subject = "Solubis Invoice Paid Receipt number {}".format(invoice)
+	sender = 'bobby@solubis.id'
+	subject = "Invoice Paid Receipt number {}".format(invoice)
 	inv = frappe.get_doc("Invoice", invoice)
 
 	context = {"doc": inv, "invoice_no": inv.name,"invoice_amount":inv.total, "invoice_paid_date": inv.paid_date, "full_name": template.full_name}

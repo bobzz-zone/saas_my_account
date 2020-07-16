@@ -91,7 +91,7 @@ def sign_up(email, full_name , subdomain, phone, plan,password, periodic, redire
 		inv.save()
 		desc = "Invoice for {} Register with plan {}".format(subdomain.lower(), plist.name)
 
-		pay_link = create_xendit_invoice(inv.name, desc,"https://billing.solubis.id/login")
+		pay_link = create_xendit_invoice(inv.name, desc,"{}/login".format(setting.billing_url))
 		# end flow
 
 		# create purchase user
