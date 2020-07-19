@@ -74,8 +74,7 @@ def create_new_site_subprocess(newsitename,sitesubdomain, subdomuser, fullname_u
 	os.chdir("/home/frappe/frappe-bench")
 	os.system("sudo su frappe")
 	os.system("bench new-site {} --db-name db_{} --mariadb-root-username root --mariadb-root-password majuterus234@ --admin-password majuterus234@ --install-app erpnext --install-app solubis_brand".format(new_site_name,site_sub_domain))
-	os.system("""bench --site reg.solubis.id execute my_account.custom_dns_api.send_mail_site_created --args "[{}','{}','{}']" 
-		""".format(subdomuser,fullname_user,site_sub_domain))
+	
 	#os.system("bench setup nginx --yes")
 	#os.system("sudo service nginx reload")
 
