@@ -169,17 +169,17 @@ def sign_up(email, full_name , subdomain, phone, plan,password, periodic, redire
 		if not subject:
 			site_name = frappe.db.get_default('site_name') or frappe.get_conf().get("site_name")
 			if site_name:
-				subject = _("Welcome to {0}".format(site_name))
+				subject = _("Welcome to Solubis")
 			else:
 				subject = _("Complete Registration")
 
 		# custom andy email to pay site registration flow invoice bayar baru create site
 		#invoice = frappe.get_doc("Invoice",{"owner":self.name})
 		# print(invoice.xendit_url)
-		user.send_login_mail(subject, "new_user",
+		user.send_login_mail(subject, "new_registration",
 				dict(
 					#link=link,
-					site_url=get_url(),
+					site_url=lengkap,
 					# custom andy email to pay site registration flow invoice bayar baru create site
 					pay_link=pay_link
 				))
@@ -214,11 +214,6 @@ def update_password(new_password, logout_all_sessions=0, key=None, old_password=
 	# edited rico - enqueue create site
 	# edited bobby comment
 	lengkap = "{}.{}".format(subdom_name,setting.url)
-
-	# create site setelah user set password (flow trial)
-	#if subdomain.is_created == 0:
-	#	enqueue("my_account.custom_dns_api.create_new_site_subprocess", newsitename=lengkap, sitesubdomain=subdom_name, subdomuser=email,  fullname_user=full_name)
-
 
 	user_doc, redirect_url = reset_user_data(user)
 	frappe.local.login_manager.login_as(user)
